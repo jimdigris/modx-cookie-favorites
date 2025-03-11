@@ -1,20 +1,22 @@
-'use strict';
-
-/* - добавление ID товара в избранное - start - */
+/* - добавление\удаление товара в\из избранное - start - */
 /* 
     В верстке у каждой миниютюры товара есть кнопка "В избранное" с дата атрибутом = id товара
     1 - находим все такие кнопки по классу
     2 - при клике на кнопке - id товара добавляется (удаляется) в куки
     и в зависимости от состояния меняется внешний вид кнопки
+
+    Для товаров на странице Избранное - аналогично: находим все кн "Удалить", при клике удаляем из куки и с экрана
 */
 (() => {
     console.log(new Date().toLocaleString());
 
-    class addToFavorites {
+    class Favorites {
         static classNames = {
             btnToFavotites: 'btn-to-favorites',
             btnToFavotitesIco: 'product__basic-txtbuttuns-btn-ico',
             btnToFavotitesText: 'product__basic-txtbuttuns-btn-txt',
+            btnRemoveFavorite: 'favorite-products-one__button-del',
+            favoriteProductsOne: 'favorite-products-one',
         }
 
         static dataAttributeNames = {
@@ -27,7 +29,7 @@
 
         // ! ---------------
 
-        static init() {
+        static initAdd() {                                                                                  // ?? для стр с товаром
             const btnsToFavorites = document.querySelectorAll(`.${this.classNames.btnToFavotites}`);        // * 1 - собрать все кн "В избранное"
             if (!btnsToFavorites.length) { return }
 
@@ -39,10 +41,27 @@
             });
         }
 
+        static initRemove() {                                                                               // ?? для стр Избранное
+            const favoriteProducts = document.querySelectorAll(`.${this.classNames.btnRemoveFavorite}`);    // * 1 - собрать все кн "Удалить из избранного"
+            if (!favoriteProducts.length) { return }
+
+            const clickHandler = this.clickBtnRemoveFavorites.bind(this);
+
+            favoriteProducts.forEach((btn) => {
+                btn.addEventListener('click', clickHandler);                                                // * 2 - нажатие на кн "Удалить из избранного"
+            });
+        }
+
         static clickBtnToFavorites(event) {                                                         // ! нажатие на кн "В избранное"
             const productId = event.currentTarget.dataset[this.dataAttributeNames.productId];       // получить ID товара
             this.toggleProductIdToCookie(productId);                                                // cохранить-удалить ИД товара в куки
             this.toggleBtnToFavorites(event.currentTarget)
+        }
+
+        static clickBtnRemoveFavorites(event) {                                                     // ! нажатие на кн "Удалить из избранного"
+            const productId = event.currentTarget.dataset[this.dataAttributeNames.productId];       // получить ID товара
+            this.toggleProductIdToCookie(productId);                                                // cохранить-удалить ИД товара в куки
+            this.removeFavorite(event);                                                             //  * 3 - удалить товар из Избранного
         }
 
         static toggleProductIdToCookie(id) {                                                        // ! cохранить-удалить ИД товара в куки
@@ -86,8 +105,13 @@
 
             console.log(`Товар ${productId}: ${isFavorite ? "в избранном" : "НЕ в избранном"}`);
         }
+
+        static removeFavorite(event) {                                                               // ! удалить товар из Избранного
+            event.target.closest(`.${this.classNames.favoriteProductsOne}`)?.remove();
+        }
     }
 
-    addToFavorites.init();
+    Favorites.initAdd();
+    Favorites.initRemove();
 })();
-/* - добавление ID товара в избранное - end - */
+/* - добавление\удаление товара в\из избранное - end - */
